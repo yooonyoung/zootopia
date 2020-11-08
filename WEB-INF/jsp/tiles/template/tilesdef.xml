@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+	<definition name="base_layout"
+		template="/WEB-INF/jsp/tiles/template/layout.jsp">
+		<put-attribute name="title" value="Zootopia" type="string"/>
+		<put-attribute name="sideLeft"
+			value="/WEB-INF/jsp/tiles/Left.jsp" />
+		<put-attribute name="sideRight"
+			value="/WEB-INF/jsp/tiles/Right.jsp" />
+		<put-attribute name="top" 
+			value="/WEB-INF/jsp/tiles/Top.jsp" />
+		<put-attribute name="meta"
+			value="/WEB-INF/jsp/tiles/meta.jsp" />
+			
+	</definition>
+
+	<definition name="layout_with_banner" extends="base_layout">
+		<put-attribute name="banner"
+			value="/WEB-INF/jsp/tiles/Banner.jsp" />
+	</definition>
+	
+	<definition name="index" extends="layout_with_banner">
+		<put-attribute name="body"
+			value="/WEB-INF/jsp/tiles/index.jsp" />
+	</definition>	
+	
+	<definition name="tiles/*" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/jsp/tiles/{1}.jsp" />
+	</definition> 
+	
+	<definition name="*" extends="layout_with_banner">
+		<put-attribute name="body"
+			value="/WEB-INF/jsp/{1}.jsp" />
+	</definition> 
+  
+  <definition name="empty" template="/WEB-INF/jsp/popup/BiddingForm.jsp">
+        <put-attribute name="content" value=""/>
+        <put-attribute name="meta"
+			value="/WEB-INF/jsp/tiles/meta.jsp" />
+    </definition>
+ 
+ 	<definition name="popup/*" extends="empty">
+ 		<put-attribute name="content" value="/WEB-INF/jsp/popup/{1}.jsp"/>
+ 	</definition>
+ 	
+ 	<!-- <definition name="tiles/Category" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/jsp/tiles/Category.jsp" />
+	</definition>
+
+	<definition name="tiles/SignonForm" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/jsp/tiles/SignonForm.jsp" />			
+	</definition>
+	
+	<definition name="tiles/EditAccountForm" extends="base_layout">
+		<put-attribute name="body"
+			value="/WEB-INF/jsp/tiles/EditAccountForm.jsp" />			
+	</definition>
+  -->
+</tiles-definitions>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.jpetstore.dao.mybatis.mapper.AuctionMapper">
+
+<select id="getAllAuctionList" resultType="Auction">
+SELECT 
+	a.AUCTIONID,
+	a.ITEM, 
+	a.THUMBNAIL,
+	a.DEADLINE
+FROM 
+	AUCTION a
+ORDER BY a.AUCTIONID DESC
+</select>
+
+<select id="getAuctionByAuctionId" resultType="Auction">
+select * from(
+SELECT   
+	a.AUCTIONID,
+	a.ITEM,
+	a.SUPPID,
+	a.MAXPRICE as PRICE,
+	a.STARTTIME,
+	a.DEADLINE,
+	a.STATUS,
+	a.IMAGE,
+	a.THUMBNAIL,
+	a.DESCRIPTION, 
+	b.biddingPrice as currentPrice
+FROM    AUCTION a left join BIDDING b  on a.AUCTIONID = b.AUCTIONID
+WHERE  a.AUCTIONID = #{auctionId}
+order by currentPrice desc)
+where ROWNUM = 1
+</select>
+
+<insert id="insertAuction">
+INSERT INTO AUCTION 
+	(AUCTIONID, SUPPID, ITEM, MAXPRICE, STARTTIME, DEADLINE
+	 <if test ="description != null">
+		, DESCRIPTION
+	 </if>
+	 <if test ="image != null">
+		, IMAGE
+	 </if>
+	 <if test ="thumbnail != null">
+		, THUMBNAIL
+	 </if>
+	) VALUES(
+	#{auctionId}, #{suppId}, #{item}, #{price}
+	, #{startTime}
+	, #{deadLine}
+	<if test ="description != null">
+		, #{description}
+	</if>
+	<if test ="image != null">
+		, #{image}
+	</if>
+	<if test ="thumbnail != null">
+		, #{thumbnail}
+	</if>
+	)
+</insert>
+
+<select id="getWinningBidbyAuctionId" resultType="WinningBid">
+SELECT * FROM
+(SELECT   
+	a.AUCTIONID,
+	a.SUPPID,
+	b.USERID,
+	b.BIDDINGID
+FROM    AUCTION a join BIDDING b  on a.AUCTIONID = b.AUCTIONID
+WHERE  a.AUCTIONID = #{auctionId}
+order by b.BIDDINGPRICE desc)
+WHERE ROWNUM = 1
+</select>
+
+<insert id="insertWinningBid">
+INSERT INTO WINNINGBID
+	(WINNINGID, BIDDINGID, AUCTIONID, SUPPID, USERID)
+VALUES
+	(#{winningId}, #{biddingId}, #{auctionId}, #{suppId}, #{userId})
+</insert>
+
+<update id="setAuctionStatus">
+	UPDATE AUCTION
+		SET STATUS=${status}
+	WHERE AUCTIONID = ${auctionId}
+</update>
+
+<delete id="deleteAuctionByAuctionId">
+	DELETE
+		FROM AUCTION
+	WHERE
+		AUCTIONID = #{auctionId}
+</delete>
+
+<select id="getAuctionBySuppId" resultType="Auction">
+SELECT max(b.biddingPrice) as currentPrice, a.ITEM, a.STATUS, a.MAXPRICE
+FROM   AUCTION a LEFT OUTER JOIN BIDDING b ON a.AUCTIONID=b.AUCTIONID 
+WHERE a.SUPPID = #{suppId}
+group by a.ITEM, a.STATUS, a.MAXPRICE
+</select>
+</mapper>

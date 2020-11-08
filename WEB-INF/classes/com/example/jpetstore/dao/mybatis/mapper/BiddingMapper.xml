@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.jpetstore.dao.mybatis.mapper.BiddingMapper">
+
+<insert id="insertBidding">
+INSERT INTO BIDDING 
+	(BIDDINGID, AUCTIONID, USERID, BIDDINGPRICE
+	) VALUES(
+	#{biddingId}, #{auctionId}, #{username}, #{biddingPrice}
+	)
+</insert>
+
+<select id="getBiddingByAuctionId" resultType="Bidding">
+select * from(
+SELECT   a.item as item, a.deadLine as deadLine, b.*
+FROM   AUCTION a, BIDDING b  
+WHERE   b.AUCTIONID = a.AUCTIONID AND b.AUCTIONID = #{auctionId}
+order by b.biddingPrice desc)
+where ROWNUM = 1
+</select>
+
+<select id="getBiddingByUsername" resultType="Bidding">
+SELECT a.ITEM, b.BIDDINGPRICE, a.STATUS, b.biddingId
+FROM AUCTION a, BIDDING b
+WHERE USERID=#{username}
+</select>
+
+<select id="getWinningByUsername" resultType="WinningBid">
+SELECT a.ITEM, b.BIDDINGPRICE, b.biddingId, w.winningId
+FROM AUCTION a, BIDDING b, WINNINGBID w
+WHERE w.USERID=#{username}
+AND w.AUCTIONID=a.AUCTIONID
+AND b.BIDDINGID=w.BIDDINGID
+</select>
+</mapper>

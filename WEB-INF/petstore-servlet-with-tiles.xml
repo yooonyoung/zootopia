@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  - DispatcherServlet application context for the Spring web MVC
+  - implementation of JPetStore's web tier.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xsi:schemaLocation="http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.1.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"> 
+
+	<context:component-scan base-package="com.example.jpetstore.controller" />
+	<mvc:default-servlet-handler />
+	<mvc:annotation-driven/>		<!-- create RequestMappingHandlerMapping -->
+    
+	<!-- ========================= TILES VIEW DEFINITIONS ========================= -->
+    <bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+        <property name="definitions">
+            <list>
+                <value>/WEB-INF/jsp/tiles/template/tilesdef.xml</value>
+            </list>
+        </property>
+    </bean>	
+
+	<!-- ========================= TILES VIEW RESOLVER ========================= -->
+    <bean id="tilesViewResolver"
+		class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
+        <property name="order" value="1"/>
+    </bean>
+    
+	<!--  tiles view가 존재하지 않을 경우 JSP view 이용 -->
+ 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+		<property name="order" value="2" />	
+	</bean>  
+	
+	<bean id="messageSource"
+      class="org.springframework.context.support.ResourceBundleMessageSource">
+      <property name="basenames">
+         <list>
+            <value>messages.validation</value>
+         </list>
+      </property>
+   </bean>
+	
+	<beans:bean id="uploadPath" class="java.lang.String">
+		<beans:constructor-arg value="C:\\zzz\\upload"></beans:constructor-arg>
+	</beans:bean>
+	
+	<mvc:view-controller path="/shop/index.do" view-name="tiles/index"/>
+	<mvc:view-controller path="/shop/signonForm.do" view-name="tiles/SignonForm"/> 
+	
+	<mvc:interceptors>
+		<mvc:interceptor>
+    	    <mvc:mapping path="/shop/editAccount.do"/>
+        	<mvc:mapping path="/shop/listOrders.do"/>
+        	<mvc:mapping path="/shop/viewOrder.do"/>
+        	<mvc:mapping path="/shop/newOrder.do"/>
+        	<mvc:mapping path="/shop/auction/newItem.do"/>
+        	<mvc:mapping path="/shop/chat.do"/>
+        	<mvc:mapping path="/shop/supplier/register.do"/>
+        	<mvc:mapping path="/shop/newItem.do"/>
+        	<bean class="com.example.jpetstore.controller.SignonInterceptor" />
+    	</mvc:interceptor>
+    	<mvc:interceptor>
+        	<mvc:mapping path="/shop/auction/newItem.do"/>
+        	<mvc:mapping path="/shop/newItem.do"/>
+        	<mvc:mapping path="/shop/editItem.do"/>
+        	<bean class="com.example.jpetstore.controller.SupplierInterceptor" />
+    	</mvc:interceptor>
+    	<mvc:interceptor>
+    		<mvc:mapping path="/shop/bidding/{auctionId}/newBidding.do"/>
+    		<bean class="com.example.jpetstore.controller.PopupSignonInterceptor"/>
+    		</mvc:interceptor>
+	</mvc:interceptors>
+	
+	<mvc:resources mapping="/resources/images/*" location="/resources/images/" />
+	
+</beans>
